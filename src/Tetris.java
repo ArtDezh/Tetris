@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.awt.event.*;
+import javax.imageio.plugins.tiff.TIFFImageReadParam;
 import javax.swing.*;
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class Tetris {
@@ -54,6 +56,7 @@ public class Tetris {
     };
 
     public static void main(String[] args) {
+
         new Tetris().go();
     }
 
@@ -69,9 +72,9 @@ public class Tetris {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (!gameOver) {
-                    if (e.getKeyCode() == DOWN) figure.drop();
-                    if (e.getKeyCode() == UP) figure.rotate();
-                    if (e.getKeyCode() == LEFT || e.getKeyCode() == RIGHT) figure.move(e.getKeyCode());
+                    if (e.getKeyCode() == DOWN) figure.drop(); // опускает фигурк
+                    if (e.getKeyCode() == UP) figure.rotate(); // вращает фигуру
+                    if (e.getKeyCode() == LEFT || e.getKeyCode() == RIGHT) figure.move(e.getKeyCode()); // перемещает фигуру в сторону
 
                 }
                 canvas.repaint();
@@ -79,5 +82,27 @@ public class Tetris {
         });
         frame.getContentPane().add(BorderLayout.CENTER, canvas);
         frame.setVisible(true);
+
+        Arrays.fill(mine[FIELD_HEIGHT], 1);
+
+        while (!gameOver) {
+            try {
+                Thread.sleep(SHOW_DELAY);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            canvas.repaint();
+            if (figure.isTouchGround()) {
+                figure.leaveOnTheGround();
+                checkFilling();
+                figure = new Figure();
+                gameOver = figure.isCrossGround();
+            } else figure.stepDown();
+        }
+    }
+
+    // проверка на заполнение строк
+    void checkFilling() {
+
     }
 }
