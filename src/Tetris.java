@@ -113,6 +113,14 @@ public class Tetris {
         @Override
         public void paint(Graphics g) {
             super.paint(g);
+            for (int x = 0; x < FIELD_WIDTH; x++) {
+                for (int y = 0; y < FIELD_HEIGHT; y++) {
+                    if (mine[y][x] > 0) {
+                        g.setColor(new Color(mine[y][x]));
+                        g.fill3DRect(x * BLOCK_SIZE + 1, y * BLOCK_SIZE + 1, BLOCK_SIZE - 1, BLOCK_SIZE - 1, true);
+                    }
+                }
+            }
             figure.paint(g);
 
         }
@@ -146,6 +154,7 @@ public class Tetris {
         }
 
         public void drop() {
+            while (!isTouchGround()) stepDown();
         }
 
         public void move(int direction) {
@@ -153,11 +162,13 @@ public class Tetris {
 
         // проверяет, касается ли фигура нижней части игравого поля или другой фигуры
         public boolean isTouchGround() {
+            for (Block block : figure) if (mine[block.getY() + 1][block.getX()] > 0) return true;
             return false;
         }
 
         // оставляет фигуру на месте, куда она упала
         public void leaveOnTheGround() {
+            for (Block block : figure) mine[block.getY()][block.getX()] = color;
         }
 
         // прверяет, на переполнение нашего игравого поля
@@ -167,6 +178,8 @@ public class Tetris {
 
         // опускает фигуру на один уровень
         public void stepDown() {
+            for (Block block : figure) block.setY(block.getY() + 1);
+            y++;
         }
 
         public void paint(Graphics g) {
