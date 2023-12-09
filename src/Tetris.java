@@ -74,7 +74,8 @@ public class Tetris {
                 if (!gameOver) {
                     if (e.getKeyCode() == DOWN) figure.drop(); // опускает фигурк
                     if (e.getKeyCode() == UP) figure.rotate(); // вращает фигуру
-                    if (e.getKeyCode() == LEFT || e.getKeyCode() == RIGHT) figure.move(e.getKeyCode()); // перемещает фигуру в сторону
+                    if (e.getKeyCode() == LEFT || e.getKeyCode() == RIGHT)
+                        figure.move(e.getKeyCode()); // перемещает фигуру в сторону
 
                 }
                 canvas.repaint();
