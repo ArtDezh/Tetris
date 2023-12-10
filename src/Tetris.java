@@ -104,9 +104,25 @@ public class Tetris {
         }
     }
 
-    // проверка на заполнение строк
+    // проверка на заполнение строк и начисление очков
     void checkFilling() {
+        int row = FIELD_HEIGHT - 1;
+        int countFillRows = 0;
+        while (row > 0) {
+            int filled = 1;
+            for(int col = 0; col < FIELD_WIDTH; col++) {
+                filled *= Integer.signum(mine[row][col]);
+            }
+            if (filled > 0) {
+                countFillRows++;
+                for (int i = row; i > 0; i--) System.arraycopy(mine[i -1], 0, mine[i], 0, FIELD_WIDTH);
+            } else {row--;}
+        }
 
+        if (countFillRows > 0) {
+            gameScores += SCORES[countFillRows - 1];
+            frame.setTitle(TITLE_OF_PROGRAM + " : " + gameScores);
+        }
     }
 
     class Canvas extends JPanel {
