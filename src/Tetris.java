@@ -158,6 +158,19 @@ public class Tetris {
         }
 
         public void move(int direction) {
+            if(!isTouchWall(direction)) {
+                int dx = direction - 38;
+                for (Block block: figure) block.setX(block.getX() + dx);
+                x += dx;
+            }
+        }
+
+        public boolean isTouchWall(int direction) {
+            for (Block block: figure) {
+                if (direction == LEFT && (block.getX() == 0 || mine[block.getY()][block.getX() - 1] > 0)) return true;
+                if (direction == RIGHT && (block.getX() == FIELD_WIDTH - 1 || mine[block.getY()][block.getX() + 1] > 0)) return true;
+            }
+            return false;
         }
 
         // проверяет, касается ли фигура нижней части игравого поля или другой фигуры
