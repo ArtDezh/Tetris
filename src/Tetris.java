@@ -1,8 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
-import javax.imageio.plugins.tiff.TIFFImageReadParam;
 import javax.swing.*;
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class Tetris {
@@ -21,6 +19,7 @@ public class Tetris {
     final int DOWN = 40;
     final int SHOW_DELAY = 400; // определяет задержку анимации
 
+    // Массив фигур. Каждая буква лат. алфавита отображает схожую фигуру.
     final int[][][] SHAPES = {
             {{0, 0, 0, 0}, {1, 1, 1, 1}, {0, 0, 0, 0}, {0, 0, 0, 0}, {4, 0x00f0f0}}, // I
             {{0, 0, 0, 0}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 0, 0, 0}, {4, 0xf0f000}}, // O
@@ -56,7 +55,6 @@ public class Tetris {
     };
 
     public static void main(String[] args) {
-
         new Tetris().go();
     }
 
@@ -76,7 +74,6 @@ public class Tetris {
                     if (e.getKeyCode() == UP) figure.rotate(); // вращает фигуру
                     if (e.getKeyCode() == LEFT || e.getKeyCode() == RIGHT)
                         figure.move(e.getKeyCode()); // перемещает фигуру в сторону
-
                 }
                 canvas.repaint();
             }
@@ -84,7 +81,7 @@ public class Tetris {
         frame.getContentPane().add(BorderLayout.CENTER, canvas);
         frame.setVisible(true);
 
-        Arrays.fill(mine[FIELD_HEIGHT], 1);
+        Arrays.fill(mine[FIELD_HEIGHT], 1); // Нижняя часть игрового поля, на которой располаются первые фигурки
     }
 
     void go() {
@@ -110,13 +107,15 @@ public class Tetris {
         int countFillRows = 0;
         while (row > 0) {
             int filled = 1;
-            for(int col = 0; col < FIELD_WIDTH; col++) {
+            for (int col = 0; col < FIELD_WIDTH; col++) {
                 filled *= Integer.signum(mine[row][col]);
             }
             if (filled > 0) {
                 countFillRows++;
-                for (int i = row; i > 0; i--) System.arraycopy(mine[i -1], 0, mine[i], 0, FIELD_WIDTH);
-            } else {row--;}
+                for (int i = row; i > 0; i--) System.arraycopy(mine[i - 1], 0, mine[i], 0, FIELD_WIDTH);
+            } else {
+                row--;
+            }
         }
 
         if (countFillRows > 0) {
@@ -125,6 +124,7 @@ public class Tetris {
         }
     }
 
+    // Отрисовка содержимого
     class Canvas extends JPanel {
         @Override
         public void paint(Graphics g) {
@@ -141,17 +141,16 @@ public class Tetris {
                 g.setColor(Color.WHITE);
                 for (int y = 0; y < GAME_OVER.length; y++) {
                     for (int x = 0; x < GAME_OVER[y].length; x++) {
-                    if (GAME_OVER[y][x] == 1) g.fill3DRect(x * 11 + 10, y * 11 + 160, 10, 10, true);
+                        if (GAME_OVER[y][x] == 1) g.fill3DRect(x * 11 + 10, y * 11 + 160, 10, 10, true);
                     }
                 }
             } else figure.paint(g);
-
         }
     }
 
     class Figure {
-        private ArrayList<Block> figure = new ArrayList<>();
-        private int[][] shape = new int[4][4];
+        private ArrayList<Block> figure = new ArrayList<>(); // Список фигур
+        private int[][] shape = new int[4][4]; // фигура размером 4х4
         private int type, size, color; // тип, размер. цвет фигуры соответственно
         private int x = 3, y = 0; // координаты фигуры
 
@@ -173,13 +172,14 @@ public class Tetris {
             }
         }
 
+        // Метод вращения фигуры
         public void rotate() {
             for (int i = 0; i < size / 2; i++) {
-                for (int j = i; j < size -1 - i; j++) {
+                for (int j = i; j < size - 1 - i; j++) {
                     int tmp = shape[size - 1 - j][i];
-                    shape[size - 1 - j][i] = shape[size -1 - i][size - 1 - j];
-                    shape[size - 1 - i][size -1 - j] = shape[j][size - 1 - i];
-                    shape[j][size -1 - i] = shape[i][j];
+                    shape[size - 1 - j][i] = shape[size - 1 - i][size - 1 - j];
+                    shape[size - 1 - i][size - 1 - j] = shape[j][size - 1 - i];
+                    shape[j][size - 1 - i] = shape[i][j];
                     shape[i][j] = tmp;
                 }
             }
@@ -190,10 +190,10 @@ public class Tetris {
             }
         }
 
-        // не дает вылезть за пределы игравого поля, накладываться на фигуры при вращении
+        // Метод не дает вылезть за пределы игравого поля, накладываться на фигуры при вращении
         public boolean isWrongPosition() {
             for (int x = 0; x < size; x++) {
-                for(int y = 0; y < size; y++) {
+                for (int y = 0; y < size; y++) {
                     if (shape[y][x] == 1) {
                         if (y + this.y < 0) return true;
                         if (x + this.x < 0 || x + this.x > FIELD_WIDTH - 1) return true;
@@ -204,49 +204,54 @@ public class Tetris {
             return false;
         }
 
+        // Метод опускания фигуры
         public void drop() {
             while (!isTouchGround()) stepDown();
         }
 
+        // Метод движения фигуры (фигура падает вниз)
         public void move(int direction) {
-            if(!isTouchWall(direction)) {
+            if (!isTouchWall(direction)) {
                 int dx = direction - 38;
-                for (Block block: figure) block.setX(block.getX() + dx);
+                for (Block block : figure) block.setX(block.getX() + dx);
                 x += dx;
             }
         }
 
+        // Метод проверки касания стенки игрового поля фигурой
         public boolean isTouchWall(int direction) {
-            for (Block block: figure) {
+            for (Block block : figure) {
                 if (direction == LEFT && (block.getX() == 0 || mine[block.getY()][block.getX() - 1] > 0)) return true;
-                if (direction == RIGHT && (block.getX() == FIELD_WIDTH - 1 || mine[block.getY()][block.getX() + 1] > 0)) return true;
+                if (direction == RIGHT && (block.getX() == FIELD_WIDTH - 1 || mine[block.getY()][block.getX() + 1] > 0))
+                    return true;
             }
             return false;
         }
 
-        // проверяет, касается ли фигура нижней части игравого поля или другой фигуры
+        // Метод проверяет, касается ли фигура нижней части игрового поля или другой фигуры
         public boolean isTouchGround() {
             for (Block block : figure) if (mine[block.getY() + 1][block.getX()] > 0) return true;
             return false;
         }
 
-        // оставляет фигуру на месте, куда она упала
+        // Метод оставляет фигуру на месте, куда она упала
         public void leaveOnTheGround() {
             for (Block block : figure) mine[block.getY()][block.getX()] = color;
         }
 
-        // прверяет, на переполнение нашего игравого поля
+        // Метод прверяет, на переполнение нашего игрового поля
         public boolean isCrossGround() {
-            for (Block block: figure) if (mine[block.getY()][block.getX()] > 0) return true;
+            for (Block block : figure) if (mine[block.getY()][block.getX()] > 0) return true;
             return false;
         }
 
-        // опускает фигуру на один уровень
+        // Метод опускает фигуру на один уровень
         public void stepDown() {
             for (Block block : figure) block.setY(block.getY() + 1);
             y++;
         }
 
+        // Метод отрисовки фигуры на полотне
         public void paint(Graphics g) {
             for (Block block : figure) block.paint(g, color);
         }
@@ -260,6 +265,7 @@ public class Tetris {
             setY(y);
         }
 
+        // Метод отрисовки блока на полотоне
         public void paint(Graphics g, int color) {
             g.setColor(new Color(color));
             g.drawRoundRect(x * BLOCK_SIZE + 1, y * BLOCK_SIZE + 1, BLOCK_SIZE - 2, BLOCK_SIZE - 2, ARC_RADIUS, ARC_RADIUS);
