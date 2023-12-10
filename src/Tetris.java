@@ -137,7 +137,14 @@ public class Tetris {
                     }
                 }
             }
-            figure.paint(g);
+            if (gameOver) {
+                g.setColor(Color.WHITE);
+                for (int y = 0; y < GAME_OVER.length; y++) {
+                    for (int x = 0; x < GAME_OVER[y].length; x++) {
+                    if (GAME_OVER[y][x] == 1) g.fill3DRect(x * 11 + 10, y * 11 + 160, 10, 10, true);
+                    }
+                }
+            } else figure.paint(g);
 
         }
     }
@@ -230,6 +237,7 @@ public class Tetris {
 
         // прверяет, на переполнение нашего игравого поля
         public boolean isCrossGround() {
+            for (Block block: figure) if (mine[block.getY()][block.getX()] > 0) return true;
             return false;
         }
 
