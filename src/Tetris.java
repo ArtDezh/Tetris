@@ -11,8 +11,8 @@ public class Tetris {
     final int FIELD_WIDTH = 10; // ширина поля (в блоках)
     final int FIELD_HEIGHT = 18; // высота поля (в блоках)
     final int START_LOCATION = 180; // координата, где появляется окно программы
-    final int FIELD_DX = 7;
-    final int FIELD_DY = 26;
+    final int FIELD_DX = 7; // для корректной установки границ игрового поля
+    final int FIELD_DY = 37;// для корректной установки границ игрового поля
     final int LEFT = 37;
     final int UP = 38;
     final int RIGHT = 39;
@@ -32,7 +32,6 @@ public class Tetris {
     final int[] SCORES = {100, 300, 700, 1500}; // количество очков за заполнение строк в игре.
     int gameScores = 0; // для хранение очков
     int[][] mine = new int[FIELD_HEIGHT + 1][FIELD_WIDTH]; // игравое поле
-
     JFrame frame;
     Canvas canvas = new Canvas();
     Random random = new Random();
@@ -70,10 +69,10 @@ public class Tetris {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (!gameOver) {
-                    if (e.getKeyCode() == DOWN) figure.drop(); // опускает фигурк
-                    if (e.getKeyCode() == UP) figure.rotate(); // вращает фигуру
+                    if (e.getKeyCode() == DOWN) figure.drop();
+                    if (e.getKeyCode() == UP) figure.rotate();
                     if (e.getKeyCode() == LEFT || e.getKeyCode() == RIGHT)
-                        figure.move(e.getKeyCode()); // перемещает фигуру в сторону
+                        figure.move(e.getKeyCode());
                 }
                 canvas.repaint();
             }
